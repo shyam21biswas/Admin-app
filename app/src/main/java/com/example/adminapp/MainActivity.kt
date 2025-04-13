@@ -57,11 +57,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AdminAppTheme {
-                TeacherApp()
-                //StudentHomeScreen()
-                //StudentCardBySubjectCode("22ec3049","VED")
-                //FetchCardBySubjectCodeScreen()
 
+               // TeacherApp()
+                StudentApp()
+               // AttendanceSummaryScreen("DA")
 
 
 
@@ -120,129 +119,7 @@ fun TeacherLoginScreen(onLogin: (String) -> Unit) {
         }
     }
 }
-/*
-@Composable
-fun CreateClassScreen(teacherId: String, navController: NavController) {
-    var name by remember { mutableStateOf("") }
-    var subject by remember { mutableStateOf("") }
-    var subjectCode by remember { mutableStateOf("") }
 
-    Column(Modifier.padding(16.dp)) {
-        OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Teacher Name") })
-        OutlinedTextField(value = subject, onValueChange = { subject = it }, label = { Text("Subject") })
-        OutlinedTextField(value = subjectCode, onValueChange = { subjectCode = it }, label = { Text("Subject Code") })
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(onClick = {
-            val data = hashMapOf(
-                "teacherName" to name,
-                "subject" to subject,
-                "subjectCode" to subjectCode,
-                "latitude" to 0.0,
-                "longitude" to 0.0,
-                "thresholdDistance" to 0
-            )
-            val db = Firebase.firestore
-
-            // Save the class info under class/teacherId/subjectCode/info
-            db.collection("class")
-                .document(teacherId)
-                .collection(subjectCode)
-                .document("info")
-                .set(data)
-
-            // Also add a reference in a separate collection for dropdown
-            db.collection("teacher_classes")
-                .document(teacherId)
-                .collection("subjectList")
-                .document(subjectCode)
-                .set(mapOf("subject" to subject))
-        }) {
-            Text("Create Class")
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(onClick = {
-            navController.navigate("updateInfo")
-        }) {
-            Text("Go to Update Location")
-        }
-    }
-}
-
-@Composable
-fun UpdateLocationScreen(teacherId: String) {
-    val db = Firebase.firestore
-    var selectedCode by remember { mutableStateOf("") }
-    var latitude by remember { mutableStateOf("") }
-    var longitude by remember { mutableStateOf("") }
-    var distance by remember { mutableStateOf("") }
-    var subjectCodes by remember { mutableStateOf(listOf<String>()) }
-
-    LaunchedEffect(teacherId) {
-        db.collection("teacher_classes")
-            .document(teacherId)
-            .collection("subjectList")
-            .get()
-            .addOnSuccessListener { snapshot ->
-                subjectCodes = snapshot.documents.mapNotNull { it.id }
-            }
-    }
-
-    Column(Modifier.padding(16.dp)) {
-        DropdownMenuBox(subjectCodes, selectedCode, onSelected = { selectedCode = it })
-
-        OutlinedTextField(value = latitude, onValueChange = { latitude = it }, label = { Text("Latitude") })
-        OutlinedTextField(value = longitude, onValueChange = { longitude = it }, label = { Text("Longitude") })
-        OutlinedTextField(value = distance, onValueChange = { distance = it }, label = { Text("Threshold Distance") })
-
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-            val updates = mapOf(
-                "latitude" to (latitude.toDoubleOrNull() ?: 0.0),
-                "longitude" to (longitude.toDoubleOrNull() ?: 0.0),
-                "thresholdDistance" to (distance.toIntOrNull() ?: 0)
-            )
-            if (selectedCode.isNotBlank()) {
-                db.collection("class")
-                    .document(teacherId)
-                    .collection(selectedCode)
-                    .document("info")
-                    .update(updates)
-            }
-        }) {
-            Text("Update Location & Distance")
-        }
-    }
-}
-
-@Composable
-fun DropdownMenuBox(options: List<String>, selected: String, onSelected: (String) -> Unit) {
-    var expanded by remember { mutableStateOf(false) }
-    Box {
-        OutlinedTextField(
-            value = selected,
-            onValueChange = {},
-            label = { Text("Select Class Code") },
-            modifier = Modifier.fillMaxWidth().clickable { expanded = true },
-            readOnly = true,
-            trailingIcon = {
-                IconButton(onClick = { expanded = true }) {
-                    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-                }
-            }
-        )
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            options.forEach { label ->
-                DropdownMenuItem(text = { Text(label) }, onClick = {
-                    onSelected(label)
-                    expanded = false
-                })
-            }
-        }
-    }
-}
-*/
 
 @Composable
 fun CreateClassScreen(teacherId: String, navController: NavController) {
@@ -250,6 +127,7 @@ fun CreateClassScreen(teacherId: String, navController: NavController) {
     var subjectName by remember { mutableStateOf("") }
     var subjectCode by remember { mutableStateOf("") }
     var teacherName by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     Column(Modifier.padding(16.dp)) {
         OutlinedTextField(value = teacherName, onValueChange = { teacherName = it }, label = { Text("Teacher Name") })
@@ -266,10 +144,12 @@ fun CreateClassScreen(teacherId: String, navController: NavController) {
                 "longitude" to 0.0,
                 "thresholdDistance" to 0
             )
+
             db.collection("teachers").document(teacherId)
                 .collection("classes")
                 .document(subjectCode)
                 .set(data)
+
             db.collection("subjectCards")
                 .document(subjectCode)
                 .set(data) // same data as saved under teachers/teacherId/classes/...
@@ -324,7 +204,7 @@ fun UpdateLocationScreen(teacherId: String) {
                 .update(updates)
             db.collection("subjectCards")
                 .document(selectedCode)
-                .set(updates) // same data as saved under teachers/teacherId/classes/...
+                .update(updates) // same data as saved under teachers/teacherId/classes/...
         }) {
             Text("Update")
         }
