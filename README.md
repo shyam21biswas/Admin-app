@@ -1,4 +1,4 @@
-# 📱 Smart Attendance App
+# 📱  BioTend - Smart Attendance App
 
 An Android application for smart, secure, and location-based attendance tracking built using **Kotlin**, **Jetpack Compose**, and **Firebase Firestore**.
 
@@ -31,7 +31,7 @@ An Android application for smart, secure, and location-based attendance tracking
 
 ## 📸 Screenshots
 
-> _Add screenshots of the teacher panel, student attendance flow, and real-time updates here._
+
 
 ## 📝 How It Works
 
